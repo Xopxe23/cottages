@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Xopxe23/cottages/internal/domain"
+	"github.com/Xopxe23/cottages/internal/transport/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -25,6 +26,8 @@ func NewHandler(auth AuthService) *Handler {
 
 func (h *Handler) InitRouter() *mux.Router {
 	r := mux.NewRouter()
+	r.Use(middleware.AddUserIdInContextMiddleware)
+	r.Use(middleware.LoggingMiddleware)
 	auth := r.PathPrefix("/auth").Subrouter()
 	{
 		auth.HandleFunc("/sign-up", h.signUp).Methods(http.MethodPost)

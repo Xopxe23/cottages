@@ -122,39 +122,3 @@ func (s *AuthService) RefreshTokens(ctx context.Context, refreshToken string) (s
 	}
 	return s.generateTokens(ctx, refresh.UserID)
 }
-
-func (s *AuthService) ParseToken(ctx context.Context, token string) (string, error) {
-	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return s.hmacSecret, nil
-	})
-	if err != nil {
-		return "", err
-	}
-
-	if !t.Valid {
-		return "", errors.New("invalid token")
-	}
-
-	claims, ok := t.Claims.(jwt.MapClaims)
-	if !ok {
-		return "", errors.New("invalid claims")
-	}
-
-	id, ok := claims["sub"].(string)
-	if !ok {
-		return "", errors.New("invalid subject")
-	}
-
-	expAt, ok := claims["expiredAt"].(int64)
-	if !ok {
-		return "", errors.New("invalid expired")
-	}
-	if expAt < time.Now().Unix() {
-		return "", errors.New("token has expired")
-	}
-	return id, nil
-}
