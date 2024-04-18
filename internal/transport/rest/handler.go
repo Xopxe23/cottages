@@ -11,6 +11,8 @@ import (
 
 type AuthService interface {
 	CreateUser(ctx context.Context, input domain.SignUpInput) error
+	Authenticate(ctx context.Context, input domain.SignInInput) (string, string, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (string, string, error)
 }
 
 type Handler struct {
@@ -26,6 +28,8 @@ func (h *Handler) InitRouter() *mux.Router {
 	auth := r.PathPrefix("/auth").Subrouter()
 	{
 		auth.HandleFunc("/sign-up", h.signUp).Methods(http.MethodPost)
+		auth.HandleFunc("/sign-in", h.signIn).Methods(http.MethodPost)
+		auth.HandleFunc("/refresh", h.refresh).Methods(http.MethodPost)
 	}
 	return r
 }

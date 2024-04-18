@@ -28,8 +28,9 @@ func main() {
 		log.Fatal(err)
 	}
 	userRepo := repository.NewUserRepository(storage.DB)
+	tokenRepo := repository.NewTokenRepository(storage.DB)
 	hasher := hasher.NewSHA1Hasher("salt")
-	authService := service.NewAuthService(userRepo, hasher)
+	authService := service.NewAuthService(userRepo, tokenRepo, hasher, []byte("sample secret"), time.Duration(time.Hour))
 	handler := rest.NewHandler(authService)
 	srv := new(domain.Server)
 	go func() {

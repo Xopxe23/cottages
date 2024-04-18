@@ -37,5 +37,18 @@ func (s *Storage) PrepareDatabase() error {
 		return err
 	}
 	_, err = statement.Exec()
+	if err != nil {
+		return err
+	}
+	statement, err = s.DB.Prepare(`CREATE TABLE IF NOT EXISTS refresh_tokens (
+		id VARCHAR(36) PRIMARY KEY,
+    	user_id VARCHAR(36) REFERENCES users(id) ON DELETE CASCADE,
+		token VARCHAR(64) NOT NULL,
+		expires_at DATETIME NOT NULL
+	)`)
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec()
 	return err
 }

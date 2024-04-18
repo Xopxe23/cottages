@@ -2,6 +2,7 @@ package hash
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 )
 
@@ -19,4 +20,15 @@ func (h *SHA1Hasher) Hash(password string) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%x", hash.Sum([]byte(h.salt))), nil
+}
+
+func (h *SHA1Hasher) VerifyPassword(password, hashedPassword string) error {
+	passwordHash, err := h.Hash(password)
+	if err != nil {
+		return err
+	}
+	if passwordHash != hashedPassword {
+		return errors.New("password incorrect")
+	}
+	return nil
 }

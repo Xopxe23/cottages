@@ -20,3 +20,10 @@ func (r *UserRepository) Create(ctx context.Context, user domain.User) error {
 	_, err := r.db.Exec(q, user.ID, user.Email, user.FirstName, user.LastName, user.Password)
 	return err
 }
+
+func (r *UserRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+	q := "SELECT * FROM users WHERE email=$1"
+	var user domain.User
+	err := r.db.QueryRow(q, email).Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.IsActive, &user.IsVerified, &user.IsStaff)
+	return user, err
+}
